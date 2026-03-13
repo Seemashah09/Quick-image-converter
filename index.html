@@ -1,0 +1,1016 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quick Image Converter - Free Online Image Tools</title>
+  <meta name="description" content="Free online image converter. Crop, resize, rotate, add filters, and remove backgrounds from your images instantly.">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --surface-color: #f0f0f0;
+      --text-color: #333333;
+      --primary-color: #6366f1;
+      --secondary-color: #22d3ee;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-color);
+      color: var(--text-color);
+    }
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .gradient-border {
+      position: relative;
+      background: var(--surface-color);
+    }
+    .gradient-border::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+    }
+    .tool-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .tool-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(99, 102, 241, 0.15);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary-color), #818cf8);
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+      transform: translateY(-2px);
+    }
+    .nav-link {
+      position: relative;
+    }
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      transition: width 0.3s ease;
+    }
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    .upload-zone {
+      border: 2px dashed rgba(99, 102, 241, 0.4);
+      transition: all 0.3s ease;
+    }
+    .upload-zone:hover, .upload-zone.dragover {
+      border-color: var(--primary-color);
+      background: rgba(99, 102, 241, 0.1);
+    }
+    .filter-btn {
+      transition: all 0.2s ease;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--primary-color);
+      color: white;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .float-animation {
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(99, 102, 241, 0.6); }
+    }
+    .pulse-glow {
+      animation: pulse-glow 2s ease-in-out infinite;
+    }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full">
+  <div id="app" class="min-h-full flex flex-col">
+   <!-- Navigation -->
+   <nav id="navbar" class="sticky top-0 z-50 backdrop-blur-lg bg-opacity-80" style="background: rgba(245, 245, 245, 0.9); border-bottom: 1px solid #e5e5e5;">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+     <div class="flex items-center justify-between h-16">
+      <a href="#" onclick="navigateTo('home'); return false;" class="flex items-center gap-2">
+       <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        </svg>
+       </div><span id="site-name" class="text-xl font-bold gradient-text">QuickImageConverter</span> </a>
+      <div class="hidden md:flex items-center gap-6">
+       <a href="#" onclick="navigateTo('home'); return false;" class="nav-link text-sm font-medium hover:text-indigo-400" style="color: #333333;">Home</a>
+       <div class="relative group">
+        <button class="nav-link text-sm font-medium hover:text-indigo-400 flex items-center gap-1"> Tools 
+         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+         </svg></button>
+        <div class="absolute top-full left-0 mt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+         <div class="gradient-border rounded-xl p-1">
+          <div class="bg-gray-900 rounded-xl py-2">
+           <a href="#" onclick="navigateTo('format-converter'); return false;" class="block px-4 py-2 text-sm hover:bg-indigo-500/20 hover:text-indigo-400">Format Converter</a> <a href="#" onclick="navigateTo('crop-resize'); return false;" class="block px-4 py-2 text-sm hover:bg-indigo-500/20 hover:text-indigo-400">Crop &amp; Resize</a> <a href="#" onclick="navigateTo('rotate-images'); return false;" class="block px-4 py-2 text-sm hover:bg-indigo-500/20 hover:text-indigo-400">Rotate Images</a> <a href="#" onclick="navigateTo('add-filters'); return false;" class="block px-4 py-2 text-sm hover:bg-indigo-500/20 hover:text-indigo-400">Add Filters</a> <a href="#" onclick="navigateTo('remove-background'); return false;" class="block px-4 py-2 text-sm hover:bg-indigo-500/20 hover:text-indigo-400">Remove Background</a>
+          </div>
+         </div>
+        </div>
+       </div><a href="#" onclick="navigateTo('blog'); return false;" class="nav-link text-sm font-medium hover:text-indigo-400">Blog</a> <a href="#" onclick="navigateTo('about'); return false;" class="nav-link text-sm font-medium hover:text-indigo-400">About</a>
+      </div><button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="md:hidden p-2 rounded-lg hover:bg-gray-800">
+       <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+       </svg></button>
+     </div>
+    </div><!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-gray-800">
+     <div class="px-4 py-4 space-y-2">
+      <a href="#" onclick="navigateTo('home'); toggleMobileMenu(); return false;" class="block py-2 text-sm font-medium hover:text-indigo-400">Home</a> <a href="#" onclick="navigateTo('format-converter'); toggleMobileMenu(); return false;" class="block py-2 text-sm font-medium hover:text-indigo-400">Format Converter</a> <a href="#" onclick="navigateTo('crop-resize'); toggleMobileMenu(); return false;" class="block py-2 text-sm font-medium hover:text-indigo-400">Crop &amp; Resize</a> <a href="#" onclick="navigateTo('rotate-images'); toggleMobileMenu(); return false;" class="block py-2 text-sm font-medium hover:text-indigo-400">Rotate Images</a> <a href="#" onclick="navigateTo('add-filters'); toggleMobileMenu(); return false;" class="block py-2 text-sm font-medium hover:text-indigo-400">Add Filters</a> <a href="#" onclick="navigateTo('remove-background'); toggleMobileMenu(); return false;" class="block py-2 text-sm font-medium hover:text-indigo-400">Remove Background</a> <a href="#" onclick="navigateTo('blog'); toggleMobileMenu(); return false;" class="block py-2 text-sm font-medium hover:text-indigo-400">Blog</a> <a href="#" onclick="navigateTo('about'); toggleMobileMenu(); return false;" class="block py-2 text-sm font-medium hover:text-indigo-400">About</a>
+     </div>
+    </div>
+   </nav><!-- Main Content -->
+   <main id="main-content" class="flex-1">
+    <!-- Content will be rendered here -->
+   </main><!-- Footer -->
+   <footer class="border-t border-gray-800 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+     <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div class="col-span-1 md:col-span-2">
+       <div class="flex items-center gap-2 mb-4">
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center">
+         <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+         </svg>
+        </div><span class="text-xl font-bold gradient-text">QuickImageConverter</span>
+       </div>
+       <p class="text-gray-400 text-sm max-w-md">The fastest and easiest way to convert, edit, and enhance your images online. No signup required, completely free.</p>
+      </div>
+      <div>
+       <h4 class="font-semibold mb-4">Tools</h4>
+       <ul class="space-y-2 text-sm text-gray-400">
+        <li><a href="#" onclick="navigateTo('format-converter'); return false;" class="hover:text-indigo-400 transition-colors">Format Converter</a></li>
+        <li><a href="#" onclick="navigateTo('crop-resize'); return false;" class="hover:text-indigo-400 transition-colors">Crop &amp; Resize</a></li>
+        <li><a href="#" onclick="navigateTo('rotate-images'); return false;" class="hover:text-indigo-400 transition-colors">Rotate Images</a></li>
+        <li><a href="#" onclick="navigateTo('add-filters'); return false;" class="hover:text-indigo-400 transition-colors">Add Filters</a></li>
+        <li><a href="#" onclick="navigateTo('remove-background'); return false;" class="hover:text-indigo-400 transition-colors">Remove Background</a></li>
+       </ul>
+      </div>
+      <div>
+       <h4 class="font-semibold mb-4">Legal</h4>
+       <ul class="space-y-2 text-sm text-gray-400">
+        <li><a href="#" onclick="navigateTo('about'); return false;" class="hover:text-indigo-400 transition-colors">About Us</a></li>
+        <li><a href="#" onclick="navigateTo('contact'); return false;" class="hover:text-indigo-400 transition-colors">Contact</a></li>
+        <li><a href="#" onclick="navigateTo('privacy'); return false;" class="hover:text-indigo-400 transition-colors">Privacy Policy</a></li>
+        <li><a href="#" onclick="navigateTo('terms'); return false;" class="hover:text-indigo-400 transition-colors">Terms of Service</a></li>
+        <li><a href="#" onclick="navigateTo('disclaimer'); return false;" class="hover:text-indigo-400 transition-colors">Disclaimer</a></li>
+       </ul>
+      </div>
+     </div>
+     <div class="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-500">
+      <p>© 2026 QuickImageConverter. All rights reserved.</p>
+     </div>
+    </div>
+   </footer>
+  </div>
+  <script>
+    // Configuration
+    const defaultConfig = {
+      site_name: 'QuickImageConverter',
+      hero_title: 'Free Image Converter Online – Crop, Resize, Rotate, Filters, Remove Background',
+      hero_subtitle: 'Convert and edit images online easily.',
+      background_color: '#0a0a0f',
+      surface_color: '#16161f',
+      text_color: '#f0f0f5',
+      primary_color: '#6366f1',
+      secondary_color: '#22d3ee',
+      font_family: 'Space Grotesk',
+      font_size: 16
+    };
+
+    let config = { ...defaultConfig };
+    let currentPage = 'home';
+    let uploadedImage = null;
+    let processedImage = null;
+
+    // Page Templates
+    const pages = {
+      home: () => `
+        <section class="relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-br from-indigo-900/20 via-transparent to-cyan-900/20"></div>
+          <div class="absolute top-20 left-10 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl"></div>
+          <div class="absolute bottom-20 right-10 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+          
+          <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
+            <div class="text-center max-w-4xl mx-auto">
+              <h1 id="hero-title" class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-6">
+                <span class="gradient-text">${config.hero_title || defaultConfig.hero_title}</span>
+              </h1>
+              <p id="hero-subtitle" class="text-xl text-gray-400 mb-10">${config.hero_subtitle || defaultConfig.hero_subtitle}</p>
+              
+              <div class="flex flex-wrap justify-center gap-4">
+                <button onclick="navigateTo('format-converter')" class="btn-primary px-8 py-4 rounded-xl font-semibold text-white">
+                  Get Started Free
+                </button>
+                <button onclick="document.getElementById('tools-section').scrollIntoView({behavior: 'smooth'})" class="px-8 py-4 rounded-xl font-semibold border border-gray-700 hover:border-indigo-500 transition-colors">
+                  Explore Tools
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="tools-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div class="text-center mb-16">
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">Powerful Image Tools</h2>
+            <p class="text-gray-400 max-w-2xl mx-auto">Everything you need to edit and convert your images, all in one place.</p>
+          </div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            ${renderToolCard('format-converter', 'Format Converter', 'Convert any image format instantly. PNG, JPG, WebP, GIF and more.', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>`)}
+            ${renderToolCard('crop-resize', 'Crop & Resize', 'Adjust image size and crop dimensions easily.', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>`)}
+            ${renderToolCard('rotate-images', 'Rotate Images', 'Rotate images clockwise or counterclockwise.', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>`)}
+            ${renderToolCard('add-filters', 'Add Filters', 'Apply filters to enhance your images.', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>`)}
+            ${renderToolCard('remove-background', 'Remove Background', 'Remove image backgrounds in seconds.', `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z"/>`)}
+          </div>
+        </section>
+
+        <section class="border-t border-gray-800">
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+            <div class="text-center mb-16">
+              <h2 class="text-3xl md:text-4xl font-bold mb-4">Why Choose Us?</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div class="text-center">
+                <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-cyan-500/20 flex items-center justify-center">
+                  <svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                  </svg>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Lightning Fast</h3>
+                <p class="text-gray-400">Process images instantly with our optimized algorithms.</p>
+              </div>
+              
+              <div class="text-center">
+                <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-cyan-500/20 flex items-center justify-center">
+                  <svg class="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                  </svg>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">100% Secure</h3>
+                <p class="text-gray-400">Your images are processed locally. We never store your files.</p>
+              </div>
+              
+<div class="text-center">
+                <div class="w-16 h-16 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-cyan-500/20 flex items-center justify-center">
+                  <svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                </div>
+                <h3 class="text-xl font-semibold mb-2">Forever Free</h3>
+                <p class="text-gray-400">No hidden fees, no signup required. Just pure functionality.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      `,
+
+      'format-converter': () => redirectToTool('https://www.freeconvert.com/image-converter'),
+
+      'crop-resize': () => redirectToTool('https://picresize.com/'),
+
+      'rotate-images': () => redirectToTool('https://imagy.app/rotate-image/'),
+
+      'add-filters': () => redirectToTool('https://www.fotor.com/goart/'),
+
+      'remove-background': () => renderToolPage(
+        'Remove Image Background Free',
+        'Remove image backgrounds in seconds. Perfect for product photos, portraits, and graphics.',
+        'Remove Background Now',
+        'background'
+      ),
+
+      blog: () => `
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <h1 class="text-4xl font-bold mb-8 gradient-text">Blog & Guides</h1>
+          
+          <div class="space-y-8">
+            ${renderBlogCard('Convert Image Format Online', 'Learn how to convert between different image formats quickly and easily.', 'format-converter')}
+            ${renderBlogCard('Crop & Resize Images Online', 'Master the art of cropping and resizing images for any purpose.', 'crop-resize')}
+            ${renderBlogCard('Rotate Images Online', 'Quick guide to rotating and flipping your images perfectly.', 'rotate-images')}
+            ${renderBlogCard('Add Filters to Image', 'Enhance your photos with professional filters and effects.', 'add-filters')}
+            ${renderBlogCard('Remove Image Background Online', 'The ultimate guide to removing backgrounds from any image.', 'remove-background')}
+          </div>
+        </div>
+      `,
+
+      about: () => renderLegalPage('About Us', `
+        <p class="mb-4">Welcome to QuickImageConverter, your go-to destination for fast, free, and secure online image editing tools.</p>
+        <p class="mb-4">Our mission is to make professional image editing accessible to everyone. Whether you're a designer, marketer, blogger, or just someone who needs to quickly edit an image, we've got you covered.</p>
+        <h2 class="text-2xl font-bold mt-8 mb-4">Our Story</h2>
+        <p class="mb-4">QuickImageConverter was founded with a simple idea: image editing shouldn't be complicated or expensive. We built a suite of tools that are powerful yet easy to use, completely free, and respect your privacy.</p>
+        <h2 class="text-2xl font-bold mt-8 mb-4">Our Promise</h2>
+        <ul class="list-disc list-inside space-y-2 text-gray-400">
+          <li>Forever free - no hidden fees or premium tiers</li>
+          <li>No signup required - just upload and edit</li>
+          <li>Privacy first - your images are processed locally</li>
+          <li>Always improving - we constantly add new features</li>
+        </ul>
+      `),
+
+      contact: () => renderLegalPage('Contact Us', `
+        <p class="mb-8">Have questions, feedback, or suggestions? We'd love to hear from you!</p>
+        <div class="gradient-border rounded-xl p-6">
+          <form onsubmit="handleContactSubmit(event)" class="space-y-6">
+            <div>
+              <label for="contact-name" class="block text-sm font-medium mb-2">Your Name</label>
+              <input type="text" id="contact-name" required class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-indigo-500 focus:outline-none transition-colors">
+            </div>
+            <div>
+              <label for="contact-email" class="block text-sm font-medium mb-2">Email Address</label>
+              <input type="email" id="contact-email" required class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-indigo-500 focus:outline-none transition-colors">
+            </div>
+            <div>
+              <label for="contact-message" class="block text-sm font-medium mb-2">Message</label>
+              <textarea id="contact-message" rows="5" required class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-indigo-500 focus:outline-none transition-colors resize-none"></textarea>
+            </div>
+            <button type="submit" class="btn-primary w-full py-3 rounded-lg font-semibold text-white">Send Message</button>
+          </form>
+        </div>
+        <p class="mt-8 text-gray-400 text-sm">You can also reach us at: <a href="mailto:support@quickimageconverter.com" class="text-indigo-400 hover:underline">support@quickimageconverter.com</a></p>
+      `),
+
+      privacy: () => renderLegalPage('Privacy Policy', `
+        <p class="text-gray-400 mb-4">Last updated: January 2024</p>
+        <h2 class="text-2xl font-bold mt-8 mb-4">Information We Collect</h2>
+        <p class="mb-4">QuickImageConverter is designed with privacy in mind. We do not collect, store, or transmit your images to any server. All image processing happens locally in your browser.</p>
+        <h2 class="text-2xl font-bold mt-8 mb-4">How We Use Information</h2>
+        <p class="mb-4">We may collect anonymous usage statistics to improve our services. This data is aggregated and cannot be used to identify individual users.</p>
+        <h2 class="text-2xl font-bold mt-8 mb-4">Cookies</h2>
+        <p class="mb-4">We use essential cookies to ensure the proper functioning of our website. These cookies do not track personal information.</p>
+        <h2 class="text-2xl font-bold mt-8 mb-4">Third-Party Services</h2>
+        <p class="mb-4">We may use third-party analytics services that collect anonymous usage data. These services have their own privacy policies.</p>
+        <h2 class="text-2xl font-bold mt-8 mb-4">Contact</h2>
+        <p>If you have questions about this Privacy Policy, please <a href="#" onclick="navigateTo('contact'); return false;" class="text-indigo-400 hover:underline">contact us</a>.</p>
+      `),
+
+      terms: () => renderLegalPage('Terms of Service', `
+        <p class="text-gray-400 mb-4">Last updated: January 2024</p>
+        <h2 class="text-2xl font-bold mt-8 mb-4">Acceptance of Terms</h2>
+        <p class="mb-4">By accessing and using QuickImageConverter, you accept and agree to be bound by these Terms of Service.</p>
+        <h2 class="text-2xl font-bold mt-8 mb-4">Use of Service</h2>
+        <p class="mb-4">Our services are provided free of charge. You may use our tools for personal or commercial purposes, subject to these terms.</p>
+        <h2 class="text-2xl font-bold mt-8 mb-4">User Responsibilities</h2>
+        <ul class="list-disc list-inside space-y-2 text-gray-400 mb-4">
+          <li>You must have the rights to any images you upload</li>
+          <li>You may not use our services for illegal purposes</li>
+          <li>You may not attempt to exploit or harm our services</li>
+        </ul>
+        <h2 class="text-2xl font-bold mt-8 mb-4">Disclaimer</h2>
+        <p class="mb-4">Our services are provided "as is" without warranties of any kind. We are not responsible for any loss or damage arising from your use of our services.</p>
+        <h2 class="text-2xl font-bold mt-8 mb-4">Changes to Terms</h2>
+        <p>We reserve the right to modify these terms at any time. Continued use of our services constitutes acceptance of any changes.</p>
+      `),
+
+      disclaimer: () => renderLegalPage('Disclaimer', `
+        <p class="text-gray-400 mb-4">Last updated: January 2024</p>
+        <h2 class="text-2xl font-bold mt-8 mb-4">General Information</h2>
+        <p class="mb-4">The information and tools provided on QuickImageConverter are for general informational purposes only. While we strive to provide accurate and useful tools, we make no representations or warranties about the completeness, accuracy, or reliability of any information or tools on this website.</p>
+        <h2 class="text-2xl font-bold mt-8 mb-4">No Professional Advice</h2>
+        <p class="mb-4">The content on this website is not intended to be a substitute for professional advice. Always seek the advice of qualified professionals for specific needs.</p>
+        <h2 class="text-2xl font-bold mt-8 mb-4">External Links</h2>
+        <p class="mb-4">Our website may contain links to external websites. We have no control over the content and nature of these sites and are not responsible for their content.</p>
+        <h2 class="text-2xl font-bold mt-8 mb-4">Limitation of Liability</h2>
+        <p>In no event shall QuickImageConverter be liable for any direct, indirect, incidental, consequential, or punitive damages arising out of your use of our services.</p>
+      `)
+    };
+
+    // Helper Functions
+    function renderToolCard(page, title, description, icon) {
+      return `
+        <div class="tool-card gradient-border rounded-2xl cursor-pointer" onclick="navigateTo('${page}')">
+          <div class="p-6 rounded-2xl bg-gray-900/50">
+            <div class="w-14 h-14 mb-4 rounded-xl bg-gradient-to-br from-indigo-500/20 to-cyan-500/20 flex items-center justify-center">
+              <svg class="w-7 h-7 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">${icon}</svg>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">${title}</h3>
+            <p class="text-gray-400 text-sm mb-4">${description}</p>
+            <span class="text-indigo-400 text-sm font-medium flex items-center gap-1">
+              Try Now
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </span>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderToolPage(title, description, buttonText, toolType) {
+      return `
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 gradient-text">${title}</h1>
+            <p class="text-xl text-gray-400">${description}</p>
+          </div>
+          
+          <div class="gradient-border rounded-2xl">
+            <div class="p-8 rounded-2xl bg-gray-900/50">
+              <!-- Upload Zone -->
+              <div id="upload-zone" class="upload-zone rounded-xl p-12 text-center cursor-pointer" onclick="document.getElementById('file-input').click()" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                <input type="file" id="file-input" accept="image/*" class="hidden" onchange="handleFileSelect(event)">
+                <div class="float-animation">
+                  <svg class="w-16 h-16 mx-auto mb-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                  </svg>
+                </div>
+                <p class="text-lg font-medium mb-2">Drop your image here</p>
+                <p class="text-gray-400 text-sm">or click to browse</p>
+                <p class="text-gray-500 text-xs mt-4">Supports PNG, JPG, WebP, GIF, BMP</p>
+              </div>
+              
+              <!-- Preview & Controls -->
+              <div id="editor-section" class="hidden mt-8">
+                <div class="flex flex-col lg:flex-row gap-8">
+                  <div class="flex-1">
+                    <div class="relative rounded-xl overflow-hidden bg-gray-800/50" style="min-height: 300px;">
+                      <canvas id="preview-canvas" class="max-w-full mx-auto"></canvas>
+                    </div>
+                  </div>
+                  
+                  <div class="lg:w-72 space-y-6">
+                    ${renderToolControls(toolType)}
+                    
+                    <button onclick="processImage()" class="btn-primary w-full py-3 rounded-xl font-semibold text-white pulse-glow">
+                      ${buttonText}
+                    </button>
+                    
+                    <button id="download-btn" onclick="downloadImage()" class="hidden w-full py-3 rounded-xl font-semibold border border-indigo-500 text-indigo-400 hover:bg-indigo-500/10 transition-colors">
+                      Download Result
+                    </button>
+                    
+                    <button onclick="resetEditor()" class="w-full py-2 rounded-lg text-sm text-gray-400 hover:text-white transition-colors">
+                      ← Upload Different Image
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="mt-16">
+            <h2 class="text-2xl font-bold mb-6">How It Works</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div class="text-center p-6">
+                <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold text-xl">1</div>
+                <h3 class="font-semibold mb-2">Upload Image</h3>
+                <p class="text-gray-400 text-sm">Drop or select any image file</p>
+              </div>
+              <div class="text-center p-6">
+                <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold text-xl">2</div>
+                <h3 class="font-semibold mb-2">Adjust Settings</h3>
+                <p class="text-gray-400 text-sm">Customize using our tools</p>
+              </div>
+              <div class="text-center p-6">
+                <div class="w-12 h-12 mx-auto mb-4 rounded-full bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold text-xl">3</div>
+                <h3 class="font-semibold mb-2">Download</h3>
+                <p class="text-gray-400 text-sm">Save your edited image</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderToolControls(toolType) {
+      switch(toolType) {
+        case 'format':
+          return `
+            <div>
+              <label class="block text-sm font-medium mb-2">Output Format</label>
+              <select id="output-format" class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-indigo-500 focus:outline-none">
+                <option value="image/png">PNG</option>
+                <option value="image/jpeg">JPG</option>
+                <option value="image/webp">WebP</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2">Quality: <span id="quality-value">90</span>%</label>
+              <input type="range" id="quality" min="10" max="100" value="90" class="w-full" oninput="document.getElementById('quality-value').textContent = this.value">
+            </div>
+          `;
+        case 'crop':
+          return `
+            <div>
+              <label class="block text-sm font-medium mb-2">Width (px)</label>
+              <input type="number" id="crop-width" placeholder="Auto" class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-indigo-500 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2">Height (px)</label>
+              <input type="number" id="crop-height" placeholder="Auto" class="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:border-indigo-500 focus:outline-none">
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="checkbox" id="maintain-ratio" checked class="rounded">
+              <label for="maintain-ratio" class="text-sm">Maintain aspect ratio</label>
+            </div>
+          `;
+        case 'rotate':
+          return `
+            <div>
+              <label class="block text-sm font-medium mb-3">Rotation</label>
+              <div class="grid grid-cols-2 gap-2">
+                <button onclick="setRotation(-90)" class="filter-btn px-4 py-2 rounded-lg bg-gray-800 text-sm">↶ 90° Left</button>
+                <button onclick="setRotation(90)" class="filter-btn px-4 py-2 rounded-lg bg-gray-800 text-sm">↷ 90° Right</button>
+                <button onclick="setRotation(180)" class="filter-btn px-4 py-2 rounded-lg bg-gray-800 text-sm">↺ 180°</button>
+                <button onclick="setRotation(0)" class="filter-btn px-4 py-2 rounded-lg bg-gray-800 text-sm">Reset</button>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-3">Flip</label>
+              <div class="grid grid-cols-2 gap-2">
+                <button onclick="setFlip('h')" class="filter-btn px-4 py-2 rounded-lg bg-gray-800 text-sm">↔ Horizontal</button>
+                <button onclick="setFlip('v')" class="filter-btn px-4 py-2 rounded-lg bg-gray-800 text-sm">↕ Vertical</button>
+              </div>
+            </div>
+          `;
+        case 'filter':
+          return `
+            <div>
+              <label class="block text-sm font-medium mb-3">Filters</label>
+              <div class="grid grid-cols-2 gap-2">
+                <button onclick="setFilter('none')" class="filter-btn active px-4 py-2 rounded-lg bg-gray-800 text-sm" data-filter="none">None</button>
+                <button onclick="setFilter('grayscale')" class="filter-btn px-4 py-2 rounded-lg bg-gray-800 text-sm" data-filter="grayscale">Grayscale</button>
+                <button onclick="setFilter('sepia')" class="filter-btn px-4 py-2 rounded-lg bg-gray-800 text-sm" data-filter="sepia">Sepia</button>
+                <button onclick="setFilter('invert')" class="filter-btn px-4 py-2 rounded-lg bg-gray-800 text-sm" data-filter="invert">Invert</button>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2">Brightness: <span id="brightness-value">100</span>%</label>
+              <input type="range" id="brightness" min="0" max="200" value="100" class="w-full" oninput="document.getElementById('brightness-value').textContent = this.value; applyFilters();">
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2">Contrast: <span id="contrast-value">100</span>%</label>
+              <input type="range" id="contrast" min="0" max="200" value="100" class="w-full" oninput="document.getElementById('contrast-value').textContent = this.value; applyFilters();">
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2">Blur: <span id="blur-value">0</span>px</label>
+              <input type="range" id="blur" min="0" max="10" value="0" class="w-full" oninput="document.getElementById('blur-value').textContent = this.value; applyFilters();">
+            </div>
+          `;
+        case 'background':
+          return `
+            <div class="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
+              <p class="text-yellow-400 text-sm">
+                <strong>Note:</strong> Background removal uses a simple algorithm. For best results, use images with clear subjects and solid backgrounds.
+              </p>
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-2">Tolerance: <span id="tolerance-value">30</span></label>
+              <input type="range" id="tolerance" min="0" max="100" value="30" class="w-full" oninput="document.getElementById('tolerance-value').textContent = this.value">
+            </div>
+          `;
+        default:
+          return '';
+      }
+    }
+
+    function renderBlogCard(title, description, page) {
+      return `
+        <article class="gradient-border rounded-xl cursor-pointer tool-card" onclick="navigateTo('${page}')">
+          <div class="p-6 rounded-xl bg-gray-900/50">
+            <h2 class="text-xl font-semibold mb-2 hover:text-indigo-400 transition-colors">${title}</h2>
+            <p class="text-gray-400 mb-4">${description}</p>
+            <span class="text-indigo-400 text-sm font-medium">Read more →</span>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderLegalPage(title, content) {
+      return `
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <h1 class="text-4xl font-bold mb-8 gradient-text">${title}</h1>
+          <div class="prose prose-invert max-w-none">
+            ${content}
+          </div>
+        </div>
+      `;
+    }
+
+    // Navigation
+    function navigateTo(page) {
+      currentPage = page;
+      uploadedImage = null;
+      processedImage = null;
+      renderPage();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function redirectToTool(url) {
+      window.open(url, '_blank', 'noopener,noreferrer');
+      return '<div></div>';
+    }
+
+    function renderPage() {
+      const mainContent = document.getElementById('main-content');
+      const pageRenderer = pages[currentPage];
+      if (pageRenderer) {
+        mainContent.innerHTML = pageRenderer();
+      }
+    }
+
+    function toggleMobileMenu() {
+      const menu = document.getElementById('mobile-menu');
+      menu.classList.toggle('hidden');
+    }
+
+    // Image Processing Functions
+    let currentRotation = 0;
+    let flipH = false;
+    let flipV = false;
+    let currentFilter = 'none';
+
+    function handleFileSelect(event) {
+const file = event.target.files[0];
+      if (file) loadImage(file);
+    }
+
+    function handleDrop(event) {
+      event.preventDefault();
+      event.currentTarget.classList.remove('dragover');
+      const file = event.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        loadImage(file);
+      }
+    }
+
+    function handleDragOver(event) {
+      event.preventDefault();
+      event.currentTarget.classList.add('dragover');
+    }
+
+    function handleDragLeave(event) {
+      event.currentTarget.classList.remove('dragover');
+    }
+
+    function loadImage(file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          uploadedImage = img;
+          currentRotation = 0;
+          flipH = false;
+          flipV = false;
+          currentFilter = 'none';
+          showEditor();
+          drawPreview();
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function showEditor() {
+      document.getElementById('upload-zone').classList.add('hidden');
+      document.getElementById('editor-section').classList.remove('hidden');
+      document.getElementById('download-btn').classList.add('hidden');
+    }
+
+    function resetEditor() {
+      document.getElementById('upload-zone').classList.remove('hidden');
+      document.getElementById('editor-section').classList.add('hidden');
+      document.getElementById('file-input').value = '';
+      uploadedImage = null;
+      processedImage = null;
+    }
+
+    function drawPreview() {
+      if (!uploadedImage) return;
+      const canvas = document.getElementById('preview-canvas');
+      const ctx = canvas.getContext('2d');
+      
+      let width = uploadedImage.width;
+      let height = uploadedImage.height;
+      
+      // Scale down for preview
+      const maxSize = 500;
+      if (width > maxSize || height > maxSize) {
+        const ratio = Math.min(maxSize / width, maxSize / height);
+        width *= ratio;
+        height *= ratio;
+      }
+      
+      // Handle rotation dimensions
+      if (currentRotation === 90 || currentRotation === -90 || currentRotation === 270) {
+        canvas.width = height;
+        canvas.height = width;
+      } else {
+        canvas.width = width;
+        canvas.height = height;
+      }
+      
+      ctx.save();
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate(currentRotation * Math.PI / 180);
+      ctx.scale(flipH ? -1 : 1, flipV ? -1 : 1);
+      ctx.drawImage(uploadedImage, -width / 2, -height / 2, width, height);
+      ctx.restore();
+      
+      // Apply filters for preview
+      if (currentPage === 'add-filters') {
+        applyFilters();
+      }
+    }
+
+    function setRotation(deg) {
+      currentRotation = deg;
+      drawPreview();
+    }
+
+    function setFlip(direction) {
+      if (direction === 'h') flipH = !flipH;
+      if (direction === 'v') flipV = !flipV;
+      drawPreview();
+    }
+
+    function setFilter(filter) {
+      currentFilter = filter;
+      document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === filter);
+      });
+      applyFilters();
+    }
+
+    function applyFilters() {
+      if (!uploadedImage) return;
+      const canvas = document.getElementById('preview-canvas');
+      
+      // Redraw base image
+      drawPreview();
+      
+      const brightness = document.getElementById('brightness')?.value || 100;
+      const contrast = document.getElementById('contrast')?.value || 100;
+      const blur = document.getElementById('blur')?.value || 0;
+      
+      let filterString = '';
+      
+      if (currentFilter === 'grayscale') filterString += 'grayscale(100%) ';
+      if (currentFilter === 'sepia') filterString += 'sepia(100%) ';
+            if (currentFilter === 'invert') filterString += 'invert(100%) ';
+      
+      filterString += `brightness(${brightness}%) contrast(${contrast}%) blur(${blur}px)`;
+      
+      canvas.style.filter = filterString;
+    }
+
+    function processImage() {
+      if (!uploadedImage) return;
+      
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      let width = uploadedImage.width;
+      let height = uploadedImage.height;
+      
+      // Handle crop/resize
+      if (currentPage === 'crop-resize') {
+        const newWidth = parseInt(document.getElementById('crop-width')?.value) || width;
+        const newHeight = parseInt(document.getElementById('crop-height')?.value) || height;
+        const maintainRatio = document.getElementById('maintain-ratio')?.checked;
+        
+        if (maintainRatio && document.getElementById('crop-width')?.value) {
+          const ratio = uploadedImage.height / uploadedImage.width;
+          width = newWidth;
+          height = Math.round(newWidth * ratio);
+        } else if (maintainRatio && document.getElementById('crop-height')?.value) {
+          const ratio = uploadedImage.width / uploadedImage.height;
+          height = newHeight;
+          width = Math.round(newHeight * ratio);
+        } else {
+          width = newWidth;
+          height = newHeight;
+        }
+      }
+      
+      // Handle rotation dimensions
+      if (currentRotation === 90 || currentRotation === -90 || currentRotation === 270) {
+        canvas.width = height;
+        canvas.height = width;
+      } else {
+        canvas.width = width;
+        canvas.height = height;
+      }
+      
+      ctx.save();
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate(currentRotation * Math.PI / 180);
+      ctx.scale(flipH ? -1 : 1, flipV ? -1 : 1);
+      ctx.drawImage(uploadedImage, -width / 2, -height / 2, width, height);
+      ctx.restore();
+      
+      // Apply filters to final image
+      if (currentPage === 'add-filters') {
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        
+        const brightness = (document.getElementById('brightness')?.value || 100) / 100;
+        const contrast = (document.getElementById('contrast')?.value || 100) / 100;
+        
+        for (let i = 0; i < data.length; i += 4) {
+          let r = data[i];
+          let g = data[i + 1];
+          let b = data[i + 2];
+          
+          // Apply filter
+          if (currentFilter === 'grayscale') {
+            const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+            r = g = b = gray;
+          } else if (currentFilter === 'sepia') {
+            const tr = 0.393 * r + 0.769 * g + 0.189 * b;
+            const tg = 0.349 * r + 0.686 * g + 0.168 * b;
+            const tb = 0.272 * r + 0.534 * g + 0.131 * b;
+            r = tr; g = tg; b = tb;
+          } else if (currentFilter === 'invert') {
+            r = 255 - r; g = 255 - g; b = 255 - b;
+          }
+          
+          // Apply brightness
+          r *= brightness; g *= brightness; b *= brightness;
+          
+          // Apply contrast
+          r = ((r / 255 - 0.5) * contrast + 0.5) * 255;
+          g = ((g / 255 - 0.5) * contrast + 0.5) * 255;
+          b = ((b / 255 - 0.5) * contrast + 0.5) * 255;
+          
+          data[i] = Math.min(255, Math.max(0, r));
+          data[i + 1] = Math.min(255, Math.max(0, g));
+          data[i + 2] = Math.min(255, Math.max(0, b));
+        }
+        
+        ctx.putImageData(imageData, 0, 0);
+      }
+      
+      // Background removal (simplified)
+      if (currentPage === 'remove-background') {
+        const tolerance = parseInt(document.getElementById('tolerance')?.value) || 30;
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const data = imageData.data;
+        
+        // Get corner colors as background reference
+        const bgR = data[0];
+        const bgG = data[1];
+        const bgB = data[2];
+        
+        for (let i = 0; i < data.length; i += 4) {
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          
+          const diff = Math.abs(r - bgR) + Math.abs(g - bgG) + Math.abs(b - bgB);
+          if (diff < tolerance * 3) {
+            data[i + 3] = 0; // Set alpha to transparent
+          }
+        }
+        
+        ctx.putImageData(imageData, 0, 0);
+      }
+      
+      processedImage = canvas;
+      document.getElementById('download-btn').classList.remove('hidden');
+      
+      // Update preview
+      const previewCanvas = document.getElementById('preview-canvas');
+      previewCanvas.style.filter = 'none';
+      const previewCtx = previewCanvas.getContext('2d');
+      const ratio = Math.min(500 / canvas.width, 500 / canvas.height, 1);
+      previewCanvas.width = canvas.width * ratio;
+      previewCanvas.height = canvas.height * ratio;
+      previewCtx.drawImage(canvas, 0, 0, previewCanvas.width, previewCanvas.height);
+    }
+
+    function downloadImage() {
+      if (!processedImage) return;
+      
+      let format = 'image/png';
+      let quality = 0.9;
+      let extension = 'png';
+      
+      if (currentPage === 'format-converter') {
+        format = document.getElementById('output-format')?.value || 'image/png';
+        quality = (document.getElementById('quality')?.value || 90) / 100;
+        extension = format.split('/')[1];
+      }
+      
+      const link = document.createElement('a');
+      link.download = `converted-image.${extension}`;
+      link.href = processedImage.toDataURL(format, quality);
+      link.click();
+    }
+
+    function handleContactSubmit(event) {
+      event.preventDefault();
+      const name = document.getElementById('contact-name').value;
+      const email = document.getElementById('contact-email').value;
+      const message = document.getElementById('contact-message').value;
+      
+      // Show success message
+      const form = event.target;
+      form.innerHTML = `
+        <div class="text-center py-8">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-green-500/20 flex items-center justify-center">
+            <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-2">Message Sent!</h3>
+          <p class="text-gray-400">Thank you for contacting us. We'll get back to you soon.</p>
+        </div>
+      `;
+    }
+
+    // Element SDK Integration
+    async function onConfigChange(newConfig) {
+      Object.assign(config, newConfig);
+      
+      // Update site name
+      const siteName = document.getElementById('site-name');
+      if (siteName) siteName.textContent = config.site_name || defaultConfig.site_name;
+      
+      // Update hero if on home page
+      const heroTitle = document.getElementById('hero-title');
+      if (heroTitle) heroTitle.innerHTML = `<span class="gradient-text">${config.hero_title || defaultConfig.hero_title}</span>`;
+      
+      const heroSubtitle = document.getElementById('hero-subtitle');
+      if (heroSubtitle) heroSubtitle.textContent = config.hero_subtitle || defaultConfig.hero_subtitle;
+      
+      // Update colors
+      document.documentElement.style.setProperty('--bg-color', config.background_color || defaultConfig.background_color);
+      document.documentElement.style.setProperty('--surface-color', config.surface_color || defaultConfig.surface_color);
+      document.documentElement.style.setProperty('--text-color', config.text_color || defaultConfig.text_color);
+      document.documentElement.style.setProperty('--primary-color', config.primary_color || defaultConfig.primary_color);
+      document.documentElement.style.setProperty('--secondary-color', config.secondary_color || defaultConfig.secondary_color);
+      
+      document.body.style.background = config.background_color || defaultConfig.background_color;
+      document.body.style.color = config.text_color || defaultConfig.text_color;
+    }
+
+    // Initialize
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities: (cfg) => ({
+          recolorables: [
+            { get: () => cfg.background_color || defaultConfig.background_color, set: (v) => window.elementSdk.setConfig({ background_color: v }) },
+            { get: () => cfg.surface_color || defaultConfig.surface_color, set: (v) => window.elementSdk.setConfig({ surface_color: v }) },
+            { get: () => cfg.text_color || defaultConfig.text_color, set: (v) => window.elementSdk.setConfig({ text_color: v }) },
+            { get: () => cfg.primary_color || defaultConfig.primary_color, set: (v) => window.elementSdk.setConfig({ primary_color: v }) },
+            { get: () => cfg.secondary_color || defaultConfig.secondary_color, set: (v) => window.elementSdk.setConfig({ secondary_color: v }) }
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => cfg.font_family || defaultConfig.font_family,
+            set: (v) => window.elementSdk.setConfig({ font_family: v })
+          },
+          fontSizeable: {
+            get: () => cfg.font_size || defaultConfig.font_size,
+            set: (v) => window.elementSdk.setConfig({ font_size: v })
+          }
+        }),
+        mapToEditPanelValues: (cfg) => new Map([
+          ['site_name', cfg.site_name || defaultConfig.site_name],
+          ['hero_title', cfg.hero_title || defaultConfig.hero_title],
+          ['hero_subtitle', cfg.hero_subtitle || defaultConfig.hero_subtitle]
+        ])
+      });
+    }
+
+    // Render initial page
+    renderPage();
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9d958a8475542704',t:'MTc3MzAxMTcxOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
